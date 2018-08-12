@@ -1,0 +1,86 @@
+Running out of space
+--------------------
+
+Tetris?
+	Gamespace get smaller
+	But how do we make the game playable and fun, and how does this affect the blocks?
+	
+	Bottom of screen keeps moving up.
+	When a tile gets completly blocked it is unavailable.
+	
+	Clearing a line pushes the "dark" down 1 tile
+	Clearing a tetris removes all the dark
+
+You are clearing the sewer
+Use your mystical abilities to clear the sewer before it overflows.
+
+Clearing a line, magically clears 2 lines of sewer
+Clearing a tetris, magically blocks the storm drain for a while
+
+Occaisional huge "dumps"
+ - Can you do poop particles
+ - Can flush up at the bottom of the playfield, pushing other tiles out of the way
+ - Maybe not push tiles, but definetly add a sound and send the particles from the left pipe,
+   spreading them out from there with the origin
+
+Move, check valid,
+Rotate check valid,
+repeat
+
+Sewer Control: The Age of Poop
+
+
+Fail line = 17
+
+Have the menu be on the city from top.png
+ - Need to create this
+
+Then have the start menu be at the top and pan down to the game when we want to play
+
+---
+
+TODO:
+ - Floating poop particles, remeber to offset for menuOffset, directional bounes, Use a clip rect
+ 
+ If time:
+ - Title falls in, bouncing would be cool
+ - Funk up the title image
+ - Juice it up, explode lines
+
+----
+
+Sewer Control started out as a simple intepretation of of the theme.
+Tetris, a game where you are already running out of space, but with yet another challenge. Sewer!
+
+You are a mysterious person that have the ability to clear out sewer playing
+tetris with mysterious squishy blocks that somehow make their way down tha manholes.
+
+Use your abilities to protect the people on the streets.
+
+Gameplay
+========
+
+While you are fighting the falling pieces,
+you also have to battle the sewage clogging up.
+To fight back clear lines. Clearing 4 lines will clear all the sewage.
+
+While the game is a rather simple twist on tetris I had a great time making it
+,and I am already looking forward to the next LD where
+I get some sort of idea/actually have time to do it
+
+Controls:
+=========
+- Esc        - Pause
+- Up         - Rotate
+- Down       - Soft landing
+- Left/Right - Move piece left/right
+- Space      - Hard landing
+- C          - Hold item
+
+
+What I used:
+============
+- C
+- SDL2,image,mixer
+- Aseprite
+- Sfxr
