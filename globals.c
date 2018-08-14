@@ -259,11 +259,13 @@ SDL_Texture *magentaTexture = 0;
 SDL_Texture *greyTexture = 0;
 SDL_Texture *greenTexture = 0;
 
-Mix_Chunk *lineClearSound = 0;
-Mix_Chunk *flushSound = 0;
-Mix_Chunk *flushFastSound = 0;
-Mix_Chunk *menuSound = 0;
-Mix_Chunk *plopSound = 0;
+#ifndef __EMSCRIPTEN__
+	Mix_Chunk *lineClearSound = 0;
+	Mix_Chunk *flushSound = 0;
+	Mix_Chunk *flushFastSound = 0;
+	Mix_Chunk *menuSound = 0;
+	Mix_Chunk *plopSound = 0;
+#endif
 
 State currentState;
 bool running = true;

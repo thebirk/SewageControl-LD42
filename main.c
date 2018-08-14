@@ -1,6 +1,10 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include <SDL2/SDL_mixer.h>
+#ifndef __EMSCRIPTEN__
+	#include <SDL2/SDL_mixer.h>
+#else
+	#include <emscripten.h>
+#endif
 #include "common.c"
 #include "globals.c"
 #include "text.c"
@@ -300,8 +304,8 @@ void renderGameOver() {
 		drawText(WIDTH/2-tw/2, 300, (Color){255, 255, 0, 255}, 4, "SCORE: %d", score);
 		
 		if(((int)t) % 2 == 0) {
-			tw = getTextWidth(2, "PRESS ANY KEY TO CONTINUE!");
-			drawText(WIDTH/2-tw/2, 450, (Color){255, 255, 255, 255}, 2, "PRESS ANY KEY TO CONTINUE!");
+			tw = getTextWidth(2, "PRESS ENTER TO CONTINUE!");
+			drawText(WIDTH/2-tw/2, 450, (Color){255, 255, 255, 255}, 2, "PRESS ENTER TO CONTINUE!");
 		}
 	}
 }
@@ -424,7 +428,9 @@ void updateMenu() {
 					fadeToPlayInitiated = true;
 					resetGame();
 					menuOffsetTarget = 0;
+					#ifndef __EMSCRIPTEN__
 					Mix_PlayChannel(-1, flushFastSound, 0);
+					#endif
 				} break;
 				case 1: {
 					currentState = Help;
@@ -437,13 +443,17 @@ void updateMenu() {
 		if(keyPressed(KEY_UP)) {
 			menuSelectedOption -= 1;
 			if(menuSelectedOption < 0) menuSelectedOption = menuOptions - 1;
+			#ifndef __EMSCRIPTEN__
 			Mix_PlayChannel(-1, menuSound, 0);
+			#endif
 		}
 
 		if(keyPressed(KEY_DOWN)) {
 			menuSelectedOption += 1;
 			if(menuSelectedOption >= menuOptions) menuSelectedOption = 0;
+			#ifndef __EMSCRIPTEN__
 			Mix_PlayChannel(-1, menuSound, 0);
+			#endif
 		}
 	}
 
@@ -478,11 +488,15 @@ void placePiece() {
 			field->tiles[i].occupied = false;
 		}
 		field->shadowHeight += 120.0;
+		#ifndef __EMSCRIPTEN__
 		Mix_PlayChannel(-1, flushFastSound, 0);
+		#endif
 	}
 
 	newPiece();
+	#ifndef __EMSCRIPTEN__
 	Mix_PlayChannel(-1, plopSound, 0);
+	#endif
 }
 
 void updatePlay() {
@@ -515,7 +529,9 @@ void updatePlay() {
 		flushTimer = 4.0;
 		flushSpeed = 20.0;
 		timeUntilFlushColor = (Color){255, 255, 255, 255};
+		#ifndef __EMSCRIPTEN__
 		Mix_PlayChannel(-1, flushSound, 0);
+		#endif
 	}
 
 	updateField();
@@ -622,7 +638,9 @@ void updatePlay() {
 			if(field->shadowHeight < 0) field->shadowHeight = 0.0;
 		}
 
+		#ifndef __EMSCRIPTEN__
 		Mix_PlayChannel(-1, lineClearSound, 0);
+		#endif
 		screenshake(0.1, pow(2.5, clearedLines > 4 ? 4 : clearedLines), 0);
 
 		if(clearedLines == 4 && lastClearedLines == 4) {
@@ -636,7 +654,7 @@ void updatePlay() {
 
 void updateGameOver() {
 	if(!fadeToMenuInitiated) {
-		if(keyPressed(KEY_ANY)) {
+		if(keyPressed(KEY_ENTER)) {
 			resetGame();
 			
 			menuOffsetTarget = 600-32;
@@ -682,13 +700,17 @@ void updatePaused() {
 		if(keyPressed(KEY_UP)) {
 			menuSelectedOption -= 1;
 			if(menuSelectedOption < 0) menuSelectedOption = menuOptions - 1;
+			#ifndef __EMSCRIPTEN__
 			Mix_PlayChannel(-1, menuSound, 0);
+			#endif
 		}
 
 		if(keyPressed(KEY_DOWN)) {
 			menuSelectedOption += 1;
 			if(menuSelectedOption >= menuOptions) menuSelectedOption = 0;
+			#ifndef __EMSCRIPTEN__
 			Mix_PlayChannel(-1, menuSound, 0);
+			#endif
 		}
 	}
 	
@@ -717,18 +739,18 @@ void update() {
 }
 
 void loadTextures() {
-	topTexture = IMG_LoadTexture(renderer, "./res/top.png");
-	poopTexture = IMG_LoadTexture(renderer, "./res/poop.png");
-	menuTexture = IMG_LoadTexture(renderer, "./res/back.png");
-	titleTexture = IMG_LoadTexture(renderer, "./res/title.png");	
+	topTexture = IMG_LoadTexture(renderer, "res/top.png");
+	poopTexture = IMG_LoadTexture(renderer, "res/poop.png");
+	menuTexture = IMG_LoadTexture(renderer, "res/back.png");
+	titleTexture = IMG_LoadTexture(renderer, "res/title.png");	
 
-	brownTexture = IMG_LoadTexture(renderer, "./res/brown2.png");
-	yellowTexture = IMG_LoadTexture(renderer, "./res/yellow.png");
-	cyanTexture = IMG_LoadTexture(renderer, "./res/cyan.png");
-	redTexture = IMG_LoadTexture(renderer, "./res/red.png");
-	magentaTexture = IMG_LoadTexture(renderer, "./res/magenta.png");
-	greyTexture = IMG_LoadTexture(renderer, "./res/grey.png");
-	greenTexture = IMG_LoadTexture(renderer, "./res/green.png");
+	brownTexture = IMG_LoadTexture(renderer, "res/brown2.png");
+	yellowTexture = IMG_LoadTexture(renderer, "res/yellow.png");
+	cyanTexture = IMG_LoadTexture(renderer, "res/cyan.png");
+	redTexture = IMG_LoadTexture(renderer, "res/red.png");
+	magentaTexture = IMG_LoadTexture(renderer, "res/magenta.png");
+	greyTexture = IMG_LoadTexture(renderer, "res/grey.png");
+	greenTexture = IMG_LoadTexture(renderer, "res/green.png");
 
 	pieceTexture[0] = brownTexture;
 	pieceTexture[1] = yellowTexture;
@@ -740,19 +762,111 @@ void loadTextures() {
 }
 
 void loadSounds() {
-	lineClearSound = Mix_LoadWAV("./res/sounds/eplode.wav");
-	flushSound = Mix_LoadWAV("./res/sounds/flush.wav");
-	flushFastSound = Mix_LoadWAV("./res/sounds/flushFast.wav");
-	menuSound = Mix_LoadWAV("./res/sounds/move.wav");
-	plopSound = Mix_LoadWAV("./res/sounds/plopPiece.wav");
+#ifndef __EMSCRIPTEN__
+	lineClearSound = Mix_LoadWAV("res/sounds/eplode.wav");
+	flushSound = Mix_LoadWAV("res/sounds/flush.wav");
+	flushFastSound = Mix_LoadWAV("res/sounds/flushFast.wav");
+	menuSound = Mix_LoadWAV("res/sounds/move.wav");
+	plopSound = Mix_LoadWAV("res/sounds/plopPiece.wav");
+#endif
 }
+
+double accumulator = 0.0;
+	
+uint64_t lastTime = 0;
+uint64_t lastTimeFps = 0;
+int frames = 0;
+int updates = 0;
+
+void main_loop() {
+	uint64_t now = getTime();
+	double frameTime = getTimeS(lastTime, now);
+	lastTime = now;
+	
+	accumulator += frameTime;
+	
+	while(accumulator >= dt) {
+		update();
+		keysUpdate();
+		updates++;
+		accumulator -= dt;
+		t += dt;
+	}
+
+	SDL_SetRenderTarget(renderer, backbuffer);
+	SDL_SetRenderDrawColor(renderer, 144, 86, 30, 255);
+	SDL_RenderClear(renderer);
+	
+	render();
+
+	// Render backbuffer
+	SDL_SetRenderTarget(renderer, 0);
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+	SDL_RenderClear(renderer);
+	SDL_RenderCopy(renderer, backbuffer, 0, &(SDL_Rect){screenshakeX, screenshakeY, WIDTH, HEIGHT});
+	SDL_RenderPresent(renderer);
+
+	frames++;
+	if(getTimeS(lastTimeFps, now) >= 1.0) {
+		printf("%d fps, %d ups\n", frames, updates);
+		//char buffer[4096];
+		//snprintf(buffer, 4096, "%d fps, %d ups\n", frames, updates);
+		//SDL_SetWindowTitle(window, buffer);
+		frames = 0;
+		updates = 0;
+		lastTimeFps = now;
+	}
+	
+	SDL_Event e;
+	while(SDL_PollEvent(&e)) {
+		switch(e.type) {
+			case SDL_QUIT: {
+				running = false;
+			} break;
+
+			case SDL_KEYDOWN: {
+				keys[KEY_ANY] = true;
+				switch(e.key.keysym.sym) {
+					case SDLK_UP: keys[KEY_UP] = true; break;
+					case SDLK_DOWN: keys[KEY_DOWN] = true; break;
+					case SDLK_LEFT: keys[KEY_LEFT] = true; break;
+					case SDLK_RIGHT: keys[KEY_RIGHT] = true; break;
+					case SDLK_SPACE: keys[KEY_SPACE] = true; break;
+					case SDLK_RETURN: keys[KEY_ENTER] = true; break;
+					case SDLK_ESCAPE: keys[KEY_ESC] = true; break;
+					case SDLK_c: keys[KEY_C] = true; break;
+				}
+			} break;
+			case SDL_KEYUP: {
+				keys[KEY_ANY] = false;
+				switch(e.key.keysym.sym) {
+					case SDLK_UP: keys[KEY_UP] = false; break;
+					case SDLK_DOWN: keys[KEY_DOWN] = false; break;
+					case SDLK_LEFT: keys[KEY_LEFT] = false; break;
+					case SDLK_RIGHT: keys[KEY_RIGHT] = false; break;
+					case SDLK_SPACE: keys[KEY_SPACE] = false; break;
+					case SDLK_RETURN: keys[KEY_ENTER] = false; break;
+					case SDLK_ESCAPE: keys[KEY_ESC] = false; break;
+					case SDLK_c: keys[KEY_C] = false; break;
+				}
+			} break;
+		}
+	}
+}
+
+/*
+emcc build:
+emcc main.c -O2 -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS=["png"] --preload-file res -o emscripten-build-dir\index.html --shell-file emscripten-build-dir\shell_minimal.html
+*/
 
 int main(int argc, char **argv) {
 	srand(time(0));
 
 	SDL_Init(SDL_INIT_EVERYTHING);
 	IMG_Init(IMG_INIT_PNG);
+	#ifndef __EMSCRIPTEN__
 	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
+	#endif
 	
 	window = SDL_CreateWindow(
 		"Sewage Control", 
@@ -760,7 +874,7 @@ int main(int argc, char **argv) {
 		WIDTH, HEIGHT, 
 		0
 	);
-	SDL_SetWindowIcon(window, IMG_Load("./res/icon.png"));
+	SDL_SetWindowIcon(window, IMG_Load("res/icon.png"));
 	
 	bool vsync = true;
 	renderer = SDL_CreateRenderer(window, -1, vsync ? SDL_RENDERER_PRESENTVSYNC : 0);
@@ -771,13 +885,6 @@ int main(int argc, char **argv) {
 	initText();
 	loadTextures();
 	loadSounds();
-
-	double accumulator = 0.0;
-	
-	uint64_t lastTime = getTime();
-	uint64_t lastTimeFps = getTime();
-	int frames = 0;
-	int updates = 0;
 
 #if 1
 	// Use these when you ship numpty
@@ -792,81 +899,16 @@ int main(int argc, char **argv) {
 	field->heldPiece.id = -1;
 	newPiece();
 	
+	lastTime = getTime();
+	lastTimeFps = getTime();
+	
+	#ifdef __EMSCRIPTEN__
+	emscripten_set_main_loop(main_loop, 0, 1);
+	#else
 	while(running) {	
-		uint64_t now = getTime();
-		double frameTime = getTimeS(lastTime, now);
-		lastTime = now;
-		
-		accumulator += frameTime;
-		
-		while(accumulator >= dt) {
-			update(dt);
-			keysUpdate();
-			updates++;
-			accumulator -= dt;
-			t += dt;
-		}
-
-		SDL_SetRenderTarget(renderer, backbuffer);
-		SDL_SetRenderDrawColor(renderer, 144, 86, 30, 255);
-		SDL_RenderClear(renderer);
-		
-		render();
-
-		// Render backbuffer
-		SDL_SetRenderTarget(renderer, 0);
-		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
-		SDL_RenderClear(renderer);
-		SDL_RenderCopy(renderer, backbuffer, 0, &(SDL_Rect){screenshakeX, screenshakeY, WIDTH, HEIGHT});
-		SDL_RenderPresent(renderer);
-
-		frames++;
-		if(getTimeS(lastTimeFps, now) >= 1.0) {
-			//printf("%d fps, %d ups\n", frames, updates);
-			//char buffer[4096];
-			//snprintf(buffer, 4096, "%d fps, %d ups\n", frames, updates);
-			//SDL_SetWindowTitle(window, buffer);
-			frames = 0;
-			updates = 0;
-			lastTimeFps = now;
-		}
-		
-		SDL_Event e;
-		while(SDL_PollEvent(&e)) {
-			switch(e.type) {
-				case SDL_QUIT: {
-					running = false;
-				} break;
-
-				case SDL_KEYDOWN: {
-					keys[KEY_ANY] = true;
-					switch(e.key.keysym.sym) {
-						case SDLK_UP: keys[KEY_UP] = true; break;
-						case SDLK_DOWN: keys[KEY_DOWN] = true; break;
-						case SDLK_LEFT: keys[KEY_LEFT] = true; break;
-						case SDLK_RIGHT: keys[KEY_RIGHT] = true; break;
-						case SDLK_SPACE: keys[KEY_SPACE] = true; break;
-						case SDLK_RETURN: keys[KEY_ENTER] = true; break;
-						case SDLK_ESCAPE: keys[KEY_ESC] = true; break;
-						case SDLK_c: keys[KEY_C] = true; break;
-					}
-				} break;
-				case SDL_KEYUP: {
-					keys[KEY_ANY] = false;
-					switch(e.key.keysym.sym) {
-						case SDLK_UP: keys[KEY_UP] = false; break;
-						case SDLK_DOWN: keys[KEY_DOWN] = false; break;
-						case SDLK_LEFT: keys[KEY_LEFT] = false; break;
-						case SDLK_RIGHT: keys[KEY_RIGHT] = false; break;
-						case SDLK_SPACE: keys[KEY_SPACE] = false; break;
-						case SDLK_RETURN: keys[KEY_ENTER] = false; break;
-						case SDLK_ESCAPE: keys[KEY_ESC] = false; break;
-						case SDLK_c: keys[KEY_C] = false; break;
-					}
-				} break;
-			}
-		}
+		main_loop();
 	}
+	#endif
 	
 	return 0;
 }
